@@ -1,4 +1,4 @@
-package mathUtil;
+package org.rivierarobotics.mathUtil;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;

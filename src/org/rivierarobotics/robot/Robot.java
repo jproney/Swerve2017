@@ -1,10 +1,10 @@
-package robot;
+package org.rivierarobotics.robot;
 
-import drivers.Driver;
+import org.rivierarobotics.drivers.Driver;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import subsystems.DriveTrain;
+import org.rivierarobotics.subsystems.DriveTrain;
 
 /**
  * The VM is configured to automatically run this class, and to call the

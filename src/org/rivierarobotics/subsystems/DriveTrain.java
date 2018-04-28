@@ -1,14 +1,14 @@
-package subsystems;
+package org.rivierarobotics.subsystems;
 
-import com.ctre.PigeonImu;
-
-import commands.SwerveControlCommand;
+import org.rivierarobotics.mathUtil.MathUtil;
+import org.rivierarobotics.mathUtil.SwerveCalculator;
+import org.rivierarobotics.mathUtil.Vector2d;
+import org.rivierarobotics.robot.Robot;
+import org.rivierarobotics.robot.RobotConstants;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import mathUtil.MathUtil;
-import mathUtil.SwerveCalculator;
-import mathUtil.Vector2d;
-import robot.Robot;
-import robot.RobotConstants;
+import org.rivierarobotics.commands.SwerveControlCommand;
+
 
 public class DriveTrain extends Subsystem {
 
@@ -16,23 +16,23 @@ public class DriveTrain extends Subsystem {
     private SwerveModule fr;
     private SwerveModule bl;
     private SwerveModule br;
-    private PigeonImu gyro;
+    private PigeonIMU gyro;
 
     public DriveTrain() {
         fl = new SwerveModule(SwerveModule.ModuleID.FL);
         fr = new SwerveModule(SwerveModule.ModuleID.FR);
         bl = new SwerveModule(SwerveModule.ModuleID.BL);
         fr = new SwerveModule(SwerveModule.ModuleID.BR);
-        gyro = new PigeonImu(RobotConstants.GYRO_PORT);
+        gyro = new PigeonIMU(RobotConstants.GYRO_PORT);
     }
 
     public void resetGyro() {
-        gyro.SetYaw(0.0);
+        gyro.setYaw(0.0, 10);
     }
 
     public double getGyroHeading() {
         double[] ypr = new double[3];
-        gyro.GetYawPitchRoll(ypr);
+        gyro.getYawPitchRoll(ypr);
         return MathUtil.wrapAngleRad(ypr[0]);
     }
 

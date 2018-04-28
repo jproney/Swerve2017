@@ -1,10 +1,14 @@
-package subsystems;
+package org.rivierarobotics.subsystems;
 
-import com.ctre.CANTalon;
+import org.rivierarobotics.mathUtil.MathUtil;
+import org.rivierarobotics.mathUtil.Vector2d;
+import org.rivierarobotics.robot.RobotConstants;
 
-import mathUtil.MathUtil;
-import mathUtil.Vector2d;
-import robot.RobotConstants;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 
 public class SwerveModule {
 
@@ -12,6 +16,10 @@ public class SwerveModule {
         FR, FL, BL, BR;
     }
 
+    private static final int MAX_POSSIBLE_VELOCITY = 100;
+    private static final int MOTION_MAGIC_IDX = 0;
+    private static final int SLOT_IDX = 0;
+    private static final int TIMEOUT = 10;
     public static final double kP = 0.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
@@ -27,8 +35,8 @@ public class SwerveModule {
 
     public double steeringEncZero;
     private Vector2d positionVec;
-    private CANTalon wheel;
-    private CANTalon steering;
+    private WPI_TalonSRX wheel;
+    private WPI_TalonSRX steering;
     private ModuleID modID;
     private final double zeroPos;
 
@@ -37,55 +45,57 @@ public class SwerveModule {
         switch (modID) {
             case FR:
                 positionVec = new Vector2d(RobotConstants.ROBOT_WIDTH, RobotConstants.ROBOT_LENGTH);
-                wheel = new CANTalon(RobotConstants.FR_DRIVE);
-                steering = new CANTalon(RobotConstants.FR_STEERING);
+                wheel = new WPI_TalonSRX(RobotConstants.FR_DRIVE);
+                steering = new WPI_TalonSRX(RobotConstants.FR_STEERING);
                 zeroPos = STEERING_ENC_ZERO_FL;
                 break;
             case FL:
                 positionVec = new Vector2d(-RobotConstants.ROBOT_WIDTH, RobotConstants.ROBOT_LENGTH);
-                wheel = new CANTalon(RobotConstants.FL_DRIVE);
-                steering = new CANTalon(RobotConstants.FL_STEERING);
+                wheel = new WPI_TalonSRX(RobotConstants.FL_DRIVE);
+                steering = new WPI_TalonSRX(RobotConstants.FL_STEERING);
                 zeroPos = STEERING_ENC_ZERO_FR;
                 break;
             case BR:
                 positionVec = new Vector2d(RobotConstants.ROBOT_WIDTH, -RobotConstants.ROBOT_LENGTH);
-                wheel = new CANTalon(RobotConstants.FR_DRIVE);
-                steering = new CANTalon(RobotConstants.FR_STEERING);
+                wheel = new WPI_TalonSRX(RobotConstants.FR_DRIVE);
+                steering = new WPI_TalonSRX(RobotConstants.FR_STEERING);
                 zeroPos = STEERING_ENC_ZERO_BL;
                 break;
             case BL:
             default:
                 positionVec = new Vector2d(-RobotConstants.ROBOT_WIDTH, -RobotConstants.ROBOT_LENGTH);
-                wheel = new CANTalon(RobotConstants.FR_DRIVE);
-                steering = new CANTalon(RobotConstants.FR_STEERING);
+                wheel = new WPI_TalonSRX(RobotConstants.FR_DRIVE);
+                steering = new WPI_TalonSRX(RobotConstants.FR_STEERING);
                 zeroPos = STEERING_ENC_ZERO_BR;
                 break;
         }
-        steering.changeControlMode(CANTalon.TalonControlMode.Position);
-        steering.setP(kP);
-        steering.setI(kI);
-        steering.setD(kD);
-        steering.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Absolute);
-        steering.configEncoderCodesPerRev(STEERING_ENC_SCALE);
-
-        wheel.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+        steering.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, MOTION_MAGIC_IDX, TIMEOUT);
+        steering.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, TIMEOUT);
+        steering.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, TIMEOUT);
+        steering.selectProfileSlot(SLOT_IDX, MOTION_MAGIC_IDX);
+        steering.config_kF(SLOT_IDX, kF, TIMEOUT);
+        steering.config_kP(SLOT_IDX, kI, TIMEOUT);
+        steering.config_kI(SLOT_IDX, kP, TIMEOUT);
+        steering.config_kD(SLOT_IDX, kD, TIMEOUT);
+        steering.configMotionCruiseVelocity((int) (MAX_POSSIBLE_VELOCITY / 2.5), TIMEOUT);
+        steering.configMotionAcceleration((int) (MAX_POSSIBLE_VELOCITY / 1.5), TIMEOUT);
     }
 
     public Vector2d getPosVec() {
         return positionVec;
     }
 
-    public double getPositionRaw() {
-        return steering.getPulseWidthPosition();
+    public double getPosition() {
+        return steering.getSelectedSensorPosition(MOTION_MAGIC_IDX);
     }
 
     public double getPositionRevs() {
-        steering.setEncPosition(steering.getPulseWidthPosition());
-        return steering.getPosition();
+        steering.getSelectedSensorPosition(MOTION_MAGIC_IDX);
+        return (double)getPosition()/(double)STEERING_ENC_SCALE;
     }
 
     public double getPositionRad() {
-        return MathUtil.wrapAngleRad(getPositionRevs() * Math.PI * 2);
+        return MathUtil.wrapAngleRad(getPositionRevs() * Math.PI * 2.0);
     }
 
     public void setPositionCounts(double pos) {
@@ -94,7 +104,7 @@ public class SwerveModule {
 
     public void setPositionRads(double ang) {
         double raw = MathUtil.wrapAngleRad(ang) / (2 * Math.PI) * STEERING_ENC_SCALE + zeroPos;
-        steering.set(raw);
+        steering.set(ControlMode.MotionMagic, raw);
     }
 
     public void setDrivePower(double pow) {

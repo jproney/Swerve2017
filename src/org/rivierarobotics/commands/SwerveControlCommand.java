@@ -1,11 +1,12 @@
-package commands;
+package org.rivierarobotics.commands;
+
+import org.rivierarobotics.mathUtil.MathUtil;
+import org.rivierarobotics.mathUtil.Vector2d;
+import org.rivierarobotics.robot.Robot;
+import org.rivierarobotics.subsystems.DriveTrain;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.command.Command;
-import mathUtil.MathUtil;
-import mathUtil.Vector2d;
-import robot.Robot;
-import subsystems.DriveTrain;
 
 public class SwerveControlCommand extends Command{
     

@@ -1,4 +1,4 @@
-package mathUtil;
+package org.rivierarobotics.mathUtil;
 
 /**
  * 

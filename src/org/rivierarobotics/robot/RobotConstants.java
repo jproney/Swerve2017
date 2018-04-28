@@ -1,4 +1,4 @@
-package robot;
+package org.rivierarobotics.robot;
 
 public class RobotConstants {
 

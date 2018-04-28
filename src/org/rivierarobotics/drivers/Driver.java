@@ -1,7 +1,8 @@
-package drivers;
+package org.rivierarobotics.drivers;
+
+import org.rivierarobotics.robot.RobotConstants;
 
 import edu.wpi.first.wpilibj.Joystick;
-import robot.RobotConstants;
 
 public class Driver {
     
