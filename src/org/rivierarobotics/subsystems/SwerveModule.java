@@ -27,7 +27,7 @@ public class SwerveModule {
     public static final double cruise = 0.0;
     public static final double accel = 0.0;
 
-    public static final int STEERING_ENC_SCALE = 4096 * 2;
+    public static final int STEERING_COUNTS_PER_REV = 4096 * 2;
     public static final double STEERING_ENC_ZERO_FL = 0.0;
     public static final double STEERING_ENC_ZERO_FR = 0.0;
     public static final double STEERING_ENC_ZERO_BL = 0.0;
@@ -74,8 +74,8 @@ public class SwerveModule {
         steering.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, TIMEOUT);
         steering.selectProfileSlot(SLOT_IDX, MOTION_MAGIC_IDX);
         steering.config_kF(SLOT_IDX, kF, TIMEOUT);
-        steering.config_kP(SLOT_IDX, kI, TIMEOUT);
-        steering.config_kI(SLOT_IDX, kP, TIMEOUT);
+        steering.config_kP(SLOT_IDX, kP, TIMEOUT);
+        steering.config_kI(SLOT_IDX, kI, TIMEOUT);
         steering.config_kD(SLOT_IDX, kD, TIMEOUT);
         steering.configMotionCruiseVelocity((int) (MAX_POSSIBLE_VELOCITY / 2.5), TIMEOUT);
         steering.configMotionAcceleration((int) (MAX_POSSIBLE_VELOCITY / 1.5), TIMEOUT);
@@ -85,26 +85,26 @@ public class SwerveModule {
         return positionVec;
     }
 
-    public double getPosition() {
+    public int getPosition() {
         return steering.getSelectedSensorPosition(MOTION_MAGIC_IDX);
     }
-
-    public double getPositionRevs() {
-        steering.getSelectedSensorPosition(MOTION_MAGIC_IDX);
-        return (double)getPosition()/(double)STEERING_ENC_SCALE;
+    
+    public int getPositionTrunc() {
+        return getPosition() & 0xFFFFD000;
     }
 
     public double getPositionRad() {
-        return MathUtil.wrapAngleRad(getPositionRevs() * Math.PI * 2.0);
+        return (double)getPositionTrunc()/(double)STEERING_COUNTS_PER_REV * Math.PI * 2.0;
     }
-
-    public void setPositionCounts(double pos) {
-        steering.set(pos);
+    
+    public void setPosition(int target) {
+        int set = (getPosition() & 0xFFFFD000) + target;
+        steering.set(ControlMode.MotionMagic, set);
     }
 
     public void setPositionRads(double ang) {
-        double raw = MathUtil.wrapAngleRad(ang) / (2 * Math.PI) * STEERING_ENC_SCALE + zeroPos;
-        steering.set(ControlMode.MotionMagic, raw);
+        double raw = MathUtil.wrapAngleRad(ang) / (2 * Math.PI) * STEERING_COUNTS_PER_REV + zeroPos;
+        setPosition((int)raw);
     }
 
     public void setDrivePower(double pow) {
@@ -118,7 +118,7 @@ public class SwerveModule {
 
     public void setToVectorSmart(Vector2d drive) {
         double pow = drive.getMagnitude();
-        if (Math.abs(drive.getMagnitude() - getPositionRad()) > Math.PI) {
+        if (Math.abs(drive.getAngle() - getPositionRad()) > Math.PI) {
             drive = drive.scale(-1);
             pow *= -1;
         }
