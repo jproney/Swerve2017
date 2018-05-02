@@ -118,5 +118,39 @@ public class MathUtil {
         return angle;
     }
     
+    /**
+     * Adjusts {@code angle} so that it is between {@code -pi} and {@code pi}.
+     * 
+     * @param angle
+     *            - the angle to adjust, in radians
+     * @return the adjusted value
+     */
+    public static double boundHalfAngleRad(double angle) {
+        while (angle >= Math.PI) {
+            angle -= 2.0 * Math.PI;
+        }
+        while (angle < -Math.PI) {
+            angle += 2.0 * Math.PI;
+        }
+        return angle;
+    }
+    
+    /**
+     * Adjusts {@code angle} so that it is between {@code -pi} and {@code pi}.
+     * 
+     * @param angle
+     *            - the angle to adjust, in radians
+     * @return the adjusted value
+     */
+    public static int boundHalfAngleNative(int ticks, int ticksPerRev) {
+        while (ticks >= ticksPerRev / 2) {
+            ticks -= ticksPerRev;
+        }
+        while (ticks < -ticksPerRev / 2) {
+            ticks += ticksPerRev;
+        }
+        return ticks;
+    }
+    
 
 }

@@ -2,9 +2,11 @@ package org.rivierarobotics.robot;
 
 import org.rivierarobotics.drivers.Driver;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.rivierarobotics.subsystems.DriveTrain;
+import org.rivierarobotics.subsystems.SwerveModule.ModuleID;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,8 +28,8 @@ public class Robot extends IterativeRobot {
 
     public Robot() {
         runningrobot = this;
-        driver = new Driver();
         dt = new DriveTrain();
+        driver = new Driver();
 
     }
 
@@ -83,6 +85,8 @@ public class Robot extends IterativeRobot {
      */
     @Override
     public void teleopPeriodic() {
+        Scheduler.getInstance().run();
+        printSmartDash();
     }
 
     /**
@@ -93,5 +97,11 @@ public class Robot extends IterativeRobot {
     }
 
     public void printSmartDash() {
+        SmartDashboard.putNumber("FL pos", dt.getModule(ModuleID.FL).getPositionTrunc());
+        SmartDashboard.putNumber("BR pos", dt.getModule(ModuleID.BR).getPositionTrunc());
+        SmartDashboard.putNumber("FL vel", dt.getModule(ModuleID.FL).getVelocity());
+        SmartDashboard.putNumber("BR vel", dt.getModule(ModuleID.BR).getVelocity());
+        SmartDashboard.putNumber("FL raw", dt.getModule(ModuleID.FL).getPosition());
+        SmartDashboard.putNumber("BR raw", dt.getModule(ModuleID.BR).getPosition());
     }
 }

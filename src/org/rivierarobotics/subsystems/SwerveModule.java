@@ -9,6 +9,8 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 
 public class SwerveModule {
 
@@ -16,14 +18,16 @@ public class SwerveModule {
         FR, FL, BL, BR;
     }
 
-    private static final int MAX_POSSIBLE_VELOCITY = 100;
+    private static final int MAX_POSSIBLE_VELOCITY = 2250;
+    private static final int CRUISE_VEL = 1800;
+    private static final int ACCEL = 3600;
     private static final int MOTION_MAGIC_IDX = 0;
     private static final int SLOT_IDX = 0;
     private static final int TIMEOUT = 10;
-    public static final double kP = 0.0;
+    public static final double kP = 0.0005*1023;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kF = 0.0;
+    public static final double kF = 0.000459*1023.0;
     public static final double cruise = 0.0;
     public static final double accel = 0.0;
 
@@ -57,18 +61,19 @@ public class SwerveModule {
                 break;
             case BR:
                 positionVec = new Vector2d(RobotConstants.ROBOT_WIDTH, -RobotConstants.ROBOT_LENGTH);
-                wheel = new WPI_TalonSRX(RobotConstants.FR_DRIVE);
-                steering = new WPI_TalonSRX(RobotConstants.FR_STEERING);
+                wheel = new WPI_TalonSRX(RobotConstants.BR_DRIVE);
+                steering = new WPI_TalonSRX(RobotConstants.BR_STEERING);
                 zeroPos = STEERING_ENC_ZERO_BL;
                 break;
             case BL:
             default:
                 positionVec = new Vector2d(-RobotConstants.ROBOT_WIDTH, -RobotConstants.ROBOT_LENGTH);
-                wheel = new WPI_TalonSRX(RobotConstants.FR_DRIVE);
-                steering = new WPI_TalonSRX(RobotConstants.FR_STEERING);
+                wheel = new WPI_TalonSRX(RobotConstants.BL_DRIVE);
+                steering = new WPI_TalonSRX(RobotConstants.BL_STEERING);
                 zeroPos = STEERING_ENC_ZERO_BR;
                 break;
         }
+        steering.setSensorPhase(true);
         steering.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, MOTION_MAGIC_IDX, TIMEOUT);
         steering.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, TIMEOUT);
         steering.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, TIMEOUT);
@@ -77,8 +82,8 @@ public class SwerveModule {
         steering.config_kP(SLOT_IDX, kP, TIMEOUT);
         steering.config_kI(SLOT_IDX, kI, TIMEOUT);
         steering.config_kD(SLOT_IDX, kD, TIMEOUT);
-        steering.configMotionCruiseVelocity((int) (MAX_POSSIBLE_VELOCITY / 2.5), TIMEOUT);
-        steering.configMotionAcceleration((int) (MAX_POSSIBLE_VELOCITY / 1.5), TIMEOUT);
+        steering.configMotionCruiseVelocity((int)CRUISE_VEL, TIMEOUT);
+        steering.configMotionAcceleration((int)ACCEL, TIMEOUT);
     }
 
     public Vector2d getPosVec() {
@@ -89,8 +94,12 @@ public class SwerveModule {
         return steering.getSelectedSensorPosition(MOTION_MAGIC_IDX);
     }
     
+    public int getVelocity() {
+        return steering.getSelectedSensorVelocity(MOTION_MAGIC_IDX);
+    }
+    
     public int getPositionTrunc() {
-        return getPosition() & 0xFFFFD000;
+        return MathUtil.boundHalfAngleNative(getPosition(), STEERING_COUNTS_PER_REV);
     }
 
     public double getPositionRad() {
@@ -98,8 +107,8 @@ public class SwerveModule {
     }
     
     public void setPosition(int target) {
-        int set = (getPosition() & 0xFFFFD000) + target;
-        steering.set(ControlMode.MotionMagic, set);
+        int diff = MathUtil.boundHalfAngleNative(target - getPositionTrunc(), STEERING_COUNTS_PER_REV);
+        steering.set(ControlMode.MotionMagic, getPosition() + diff);
     }
 
     public void setPositionRads(double ang) {
@@ -108,7 +117,11 @@ public class SwerveModule {
     }
 
     public void setDrivePower(double pow) {
-        wheel.set(pow);
+        wheel.set(ControlMode.PercentOutput,pow);
+    }
+    
+    public void setSteeringPower(double pow) {
+        steering.set(ControlMode.PercentOutput, pow);
     }
 
     public void setToVectorDumb(Vector2d drive) {
