@@ -36,7 +36,7 @@ public class DriveTrain extends Subsystem {
     public double getGyroHeading() {
         double[] ypr = new double[3];
         gyro.getYawPitchRoll(ypr);
-        return MathUtil.wrapAngleRad(ypr[0]);
+        return ypr[0];
     }
 
     public void swerve(double rot, Vector2d trans) {

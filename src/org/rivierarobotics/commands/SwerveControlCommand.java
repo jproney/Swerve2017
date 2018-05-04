@@ -27,11 +27,13 @@ public class SwerveControlCommand extends Command{
     @Override
     public void execute() {
         if(MathUtil.outOfDeadband(transStick, DEADBAND) || MathUtil.outOfDeadband(rotStick, DEADBAND)) {
-              dt.getModule(ModuleID.FL).setPositionRads(rotStick.getDirectionRadians());
-              dt.getModule(ModuleID.BR).setPositionRads(rotStick.getDirectionRadians());
+             Vector2d drive = MathUtil.adjustDeadband(transStick, DEADBAND, false, false);
+             Vector2d d2 = drive.rotate(Math.toRadians(dt.getGyroHeading()));
+             dt.getModule(ModuleID.FL).setToVectorSmart(d2);
+             dt.getModule(ModuleID.BR).setToVectorSmart(d2);
 //            Vector2d transVec = MathUtil.adjustDeadband(transStick, DEADBAND, true);
 //            double spinVal = MathUtil.adjustDeadband(rotStick, DEADBAND, true).getX();
-//            dt.swerve(spinVal, transVec);
+//            dt.swerve(0.0, transVec);
         }
         else {
             dt.stop();

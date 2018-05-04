@@ -32,10 +32,10 @@ public class SwerveModule {
     public static final double accel = 0.0;
 
     public static final int STEERING_COUNTS_PER_REV = 4096 * 2;
-    public static final double STEERING_ENC_ZERO_FL = 0.0;
+    public static final double STEERING_ENC_ZERO_FL = -3061 + 2048;
     public static final double STEERING_ENC_ZERO_FR = 0.0;
     public static final double STEERING_ENC_ZERO_BL = 0.0;
-    public static final double STEERING_ENC_ZERO_BR = 0.0;
+    public static final double STEERING_ENC_ZERO_BR = -3809 + 2048;
 
     public double steeringEncZero;
     private Vector2d positionVec;
@@ -48,32 +48,35 @@ public class SwerveModule {
         modID = id;
         switch (modID) {
             case FR:
-                positionVec = new Vector2d(RobotConstants.ROBOT_WIDTH, RobotConstants.ROBOT_LENGTH);
+                positionVec = new Vector2d(RobotConstants.ROBOT_WIDTH/2.0, RobotConstants.ROBOT_LENGTH/2.0);
                 wheel = new WPI_TalonSRX(RobotConstants.FR_DRIVE);
                 steering = new WPI_TalonSRX(RobotConstants.FR_STEERING);
-                zeroPos = STEERING_ENC_ZERO_FL;
-                break;
-            case FL:
-                positionVec = new Vector2d(-RobotConstants.ROBOT_WIDTH, RobotConstants.ROBOT_LENGTH);
-                wheel = new WPI_TalonSRX(RobotConstants.FL_DRIVE);
-                steering = new WPI_TalonSRX(RobotConstants.FL_STEERING);
                 zeroPos = STEERING_ENC_ZERO_FR;
                 break;
+            case FL:
+                positionVec = new Vector2d(-RobotConstants.ROBOT_WIDTH/2.0, RobotConstants.ROBOT_LENGTH/2.0);
+                wheel = new WPI_TalonSRX(RobotConstants.FL_DRIVE);
+                steering = new WPI_TalonSRX(RobotConstants.FL_STEERING);
+                zeroPos = STEERING_ENC_ZERO_FL;
+                break;
             case BR:
-                positionVec = new Vector2d(RobotConstants.ROBOT_WIDTH, -RobotConstants.ROBOT_LENGTH);
+                positionVec = new Vector2d(RobotConstants.ROBOT_WIDTH/2.0, -RobotConstants.ROBOT_LENGTH/2.0);
                 wheel = new WPI_TalonSRX(RobotConstants.BR_DRIVE);
                 steering = new WPI_TalonSRX(RobotConstants.BR_STEERING);
-                zeroPos = STEERING_ENC_ZERO_BL;
+                zeroPos = STEERING_ENC_ZERO_BR;
                 break;
             case BL:
             default:
-                positionVec = new Vector2d(-RobotConstants.ROBOT_WIDTH, -RobotConstants.ROBOT_LENGTH);
+                positionVec = new Vector2d(-RobotConstants.ROBOT_WIDTH/2.0, -RobotConstants.ROBOT_LENGTH/2.0);
                 wheel = new WPI_TalonSRX(RobotConstants.BL_DRIVE);
                 steering = new WPI_TalonSRX(RobotConstants.BL_STEERING);
-                zeroPos = STEERING_ENC_ZERO_BR;
+                zeroPos = STEERING_ENC_ZERO_BL;
                 break;
         }
         steering.setSensorPhase(true);
+        if(modID == ModuleID.BR) {
+            wheel.setInverted(true);
+        }
         steering.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, MOTION_MAGIC_IDX, TIMEOUT);
         steering.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, TIMEOUT);
         steering.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, TIMEOUT);
@@ -103,7 +106,7 @@ public class SwerveModule {
     }
 
     public double getPositionRad() {
-        return (double)getPositionTrunc()/(double)STEERING_COUNTS_PER_REV * Math.PI * 2.0;
+        return MathUtil.boundHalfAngleRad((double)(getPosition() - zeroPos)/(double)STEERING_COUNTS_PER_REV * Math.PI * 2.0);
     }
     
     public void setPosition(int target) {
@@ -131,7 +134,7 @@ public class SwerveModule {
 
     public void setToVectorSmart(Vector2d drive) {
         double pow = drive.getMagnitude();
-        if (Math.abs(drive.getAngle() - getPositionRad()) > Math.PI) {
+        if (Math.abs(MathUtil.boundHalfAngleRad(drive.getAngle() - getPositionRad())) > Math.PI/2.0) {
             drive = drive.scale(-1);
             pow *= -1;
         }

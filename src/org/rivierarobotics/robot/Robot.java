@@ -79,6 +79,11 @@ public class Robot extends IterativeRobot {
                 break;
         }
     }
+    
+    @Override
+    public void teleopInit() {
+        dt.resetGyro();
+    }
 
     /**
      * This function is called periodically during operator control
@@ -103,9 +108,10 @@ public class Robot extends IterativeRobot {
     public void printSmartDash() {
         SmartDashboard.putNumber("FL pos", dt.getModule(ModuleID.FL).getPositionTrunc());
         SmartDashboard.putNumber("BR pos", dt.getModule(ModuleID.BR).getPositionTrunc());
-        SmartDashboard.putNumber("FL vel", dt.getModule(ModuleID.FL).getVelocity());
-        SmartDashboard.putNumber("BR vel", dt.getModule(ModuleID.BR).getVelocity());
+        SmartDashboard.putNumber("FL rad", dt.getModule(ModuleID.FL).getPositionRad());
+        SmartDashboard.putNumber("BR rad", dt.getModule(ModuleID.BR).getPositionRad());
         SmartDashboard.putNumber("FL raw", dt.getModule(ModuleID.FL).getPosition());
         SmartDashboard.putNumber("BR raw", dt.getModule(ModuleID.BR).getPosition());
+        SmartDashboard.putNumber("Gyro", dt.getGyroHeading());
     }
 }

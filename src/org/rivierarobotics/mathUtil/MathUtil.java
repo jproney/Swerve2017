@@ -65,11 +65,16 @@ public class MathUtil {
      * @return the mapped axis values
      * @see #adjustDeadband(Vector2d, Vector2d)
      */
-    public static Vector2d adjustDeadband(Joystick joy, Vector2d band, boolean invertThrottle) {
+    public static Vector2d adjustDeadband(Joystick joy, Vector2d band, boolean invertThrottle, boolean invertX) {
+        int xMult = 1;
+        int yMult = 1;
         if(invertThrottle) {
-            return adjustDeadband(new Vector2d(joy.getX(), -joy.getY()), band);
+            yMult = -1;
         }
-        return adjustDeadband(new Vector2d(joy.getX(), joy.getY()), band);
+        if(invertX) {
+            xMult = -1;
+        }
+        return adjustDeadband(new Vector2d(joy.getX()*xMult, joy.getY()*yMult), band);
     }
 
     /**
