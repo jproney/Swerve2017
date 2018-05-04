@@ -110,6 +110,10 @@ public class Vector2d {
     public Vector2d abs() {
         return new Vector2d(Math.abs(x), Math.abs(y));
     }
+    
+    public Vector2d clone() {
+        return new Vector2d(x,y);
+    }
 
     @Override
     public String toString() {
