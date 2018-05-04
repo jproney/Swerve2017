@@ -89,6 +89,10 @@ public class Robot extends IterativeRobot {
         printSmartDash();
     }
 
+    @Override
+    public void disabledPeriodic() {
+        printSmartDash();
+    }
     /**
      * This function is called periodically during test mode
      */

@@ -71,8 +71,8 @@ public class DriveTrain extends Subsystem {
 
     @Override
     protected void initDefaultCommand() {
-//        setDefaultCommand(new SwerveControlCommand(Robot.runningrobot.driver.leftJoy,
-//                Robot.runningrobot.driver.rightJoy));
+        setDefaultCommand(new SwerveControlCommand(Robot.runningrobot.driver.leftJoy,
+                Robot.runningrobot.driver.rightJoy));
     }
 
 }

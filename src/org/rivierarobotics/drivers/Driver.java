@@ -18,14 +18,6 @@ public class Driver {
         leftJoy = new Joystick(RobotConstants.LEFT_JOYSTICK_PORT);
         rightJoy = new Joystick(RobotConstants.RIGHT_JOYSTICK_PORT);
         buttons = new Joystick(RobotConstants.BUTTONS_PORT);
-        
-        JoystickButton setPower1 = new JoystickButton(leftJoy,6);
-        setPower1.whenPressed(new SetModulePosition(5000, ModuleID.FL));
-        setPower1.whenReleased(new SetModulePosition(0, ModuleID.FL));
-        
-        JoystickButton setPower2 = new JoystickButton(leftJoy,5);
-        setPower2.whenPressed(new SetModulePosition(5000, ModuleID.BR));
-        setPower2.whenReleased(new SetModulePosition(0,ModuleID.BR));
     }
     
 }

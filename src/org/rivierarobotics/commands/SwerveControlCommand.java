@@ -4,6 +4,7 @@ import org.rivierarobotics.mathUtil.MathUtil;
 import org.rivierarobotics.mathUtil.Vector2d;
 import org.rivierarobotics.robot.Robot;
 import org.rivierarobotics.subsystems.DriveTrain;
+import org.rivierarobotics.subsystems.SwerveModule.ModuleID;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.command.Command;
@@ -26,9 +27,11 @@ public class SwerveControlCommand extends Command{
     @Override
     public void execute() {
         if(MathUtil.outOfDeadband(transStick, DEADBAND) || MathUtil.outOfDeadband(rotStick, DEADBAND)) {
-            Vector2d transVec = MathUtil.adjustDeadband(transStick, DEADBAND, true);
-            double spinVal = MathUtil.adjustDeadband(rotStick, DEADBAND, true).getX();
-            dt.swerve(spinVal, transVec);
+              dt.getModule(ModuleID.FL).setPositionRads(rotStick.getDirectionRadians());
+              dt.getModule(ModuleID.BR).setPositionRads(rotStick.getDirectionRadians());
+//            Vector2d transVec = MathUtil.adjustDeadband(transStick, DEADBAND, true);
+//            double spinVal = MathUtil.adjustDeadband(rotStick, DEADBAND, true).getX();
+//            dt.swerve(spinVal, transVec);
         }
         else {
             dt.stop();

@@ -20,7 +20,7 @@ public class SwerveModule {
 
     private static final int MAX_POSSIBLE_VELOCITY = 2250;
     private static final int CRUISE_VEL = 1800;
-    private static final int ACCEL = 3600;
+    private static final int ACCEL = 7200;
     private static final int MOTION_MAGIC_IDX = 0;
     private static final int SLOT_IDX = 0;
     private static final int TIMEOUT = 10;
