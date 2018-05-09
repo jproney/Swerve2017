@@ -40,7 +40,7 @@ public class DriveTrain extends Subsystem {
     }
 
     public void swerve(double rot, Vector2d trans) {
-        Vector2d[] swerveVecs = SwerveCalculator.calculateAllModules(getGyroHeading(), rot, trans, fl.getPosVec(), br.getPosVec());
+        Vector2d[] swerveVecs = SwerveCalculator.calculateAllModules(Math.toRadians(getGyroHeading()), rot, trans, fl.getPosVec(), br.getPosVec());
         fl.setToVectorSmart(swerveVecs[0]);
         //fr.setToVectorSmart(swerveVecs[1]);
         //bl.setToVectorSmart(swerveVecs[2]);

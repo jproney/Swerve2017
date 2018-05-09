@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class SwerveModule {
@@ -117,6 +118,12 @@ public class SwerveModule {
     public void setPositionRads(double ang) {
         double raw = MathUtil.wrapAngleRad(ang) / (2 * Math.PI) * STEERING_COUNTS_PER_REV + zeroPos;
         setPosition((int)raw);
+        if(modID == ModuleID.FL) {
+            SmartDashboard.putNumber("FL setpoint", (int)raw);
+        }
+        else {
+            SmartDashboard.putNumber("BR setpoint", (int)raw);
+        }
     }
 
     public void setDrivePower(double pow) {
