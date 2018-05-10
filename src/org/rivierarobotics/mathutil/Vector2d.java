@@ -1,4 +1,4 @@
-package org.rivierarobotics.mathUtil;
+package org.rivierarobotics.mathutil;
 
 /**
  * A simple 2D vector class.

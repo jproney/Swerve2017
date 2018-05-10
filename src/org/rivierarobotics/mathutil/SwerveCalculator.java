@@ -1,4 +1,4 @@
-package org.rivierarobotics.mathUtil;
+package org.rivierarobotics.mathutil;
 
 import edu.wpi.first.wpilibj.DriverStation;
 

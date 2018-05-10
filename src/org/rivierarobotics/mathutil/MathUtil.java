@@ -1,4 +1,4 @@
-package org.rivierarobotics.mathUtil;
+package org.rivierarobotics.mathutil;
 
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -158,10 +158,12 @@ public class MathUtil {
     }
     
     /**
-     * Adjusts {@code angle} so that it is between {@code -pi} and {@code pi}.
+     * Adjusts {@code ticks} so that it is between {@code -ticksPerRev/2} and {@code ticksPerRev/2}.
      * 
-     * @param angle
-     *            - the angle to adjust, in radians
+     * @param ticks
+     *            - the encoder count to adjust in native ticks
+     * @param ticksPerRev
+     *            - number of native encoder ticks per revolution
      * @return the adjusted value
      */
     public static int boundHalfAngleNative(int ticks, int ticksPerRev) {

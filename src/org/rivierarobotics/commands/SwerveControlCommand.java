@@ -1,7 +1,7 @@
 package org.rivierarobotics.commands;
 
-import org.rivierarobotics.mathUtil.MathUtil;
-import org.rivierarobotics.mathUtil.Vector2d;
+import org.rivierarobotics.mathutil.MathUtil;
+import org.rivierarobotics.mathutil.Vector2d;
 import org.rivierarobotics.robot.Robot;
 import org.rivierarobotics.subsystems.DriveTrain;
 
