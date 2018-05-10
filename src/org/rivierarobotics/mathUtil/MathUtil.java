@@ -141,6 +141,23 @@ public class MathUtil {
     }
     
     /**
+     * Adjusts {@code angle} so that it is between {@code -180} and {@code 180}.
+     * 
+     * @param angle
+     *            - the angle to adjust, in degrees
+     * @return the adjusted value
+     */
+    public static double boundHalfAngleDeg(double angle) {
+        while (angle >= 180.0) {
+            angle -= 360.0;
+        }
+        while (angle < -180.0) {
+            angle += 360.0;
+        }
+        return angle;
+    }
+    
+    /**
      * Adjusts {@code angle} so that it is between {@code -pi} and {@code pi}.
      * 
      * @param angle

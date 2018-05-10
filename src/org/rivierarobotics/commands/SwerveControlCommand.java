@@ -4,18 +4,19 @@ import org.rivierarobotics.mathUtil.MathUtil;
 import org.rivierarobotics.mathUtil.Vector2d;
 import org.rivierarobotics.robot.Robot;
 import org.rivierarobotics.subsystems.DriveTrain;
-import org.rivierarobotics.subsystems.SwerveModule.ModuleID;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class SwerveControlCommand extends Command{
     
-    public static final Vector2d DEADBAND = new Vector2d(.2, .2);
+    public static final Vector2d DEADBAND = new Vector2d(.1, .1);
+    public static final double kHeading = .01;
     
     private DriveTrain dt;
     private Joystick transStick;
     private Joystick rotStick;
+    private double setHeading = Double.NaN;
     
     public SwerveControlCommand(Joystick trans, Joystick spin) {
         dt = Robot.runningrobot.dt;
@@ -26,18 +27,28 @@ public class SwerveControlCommand extends Command{
     
     @Override
     public void execute() {
-        if(MathUtil.outOfDeadband(transStick, DEADBAND) || MathUtil.outOfDeadband(rotStick, DEADBAND)) {
-             //Vector2d drive = MathUtil.adjustDeadband(transStick, DEADBAND, false, false);
-             //Vector2d d2 = drive.rotate(Math.toRadians(dt.getGyroHeading()));
-             //dt.getModule(ModuleID.FL).setToVectorSmart(d2.clone());
-             //dt.getModule(ModuleID.BR).setToVectorSmart(d2.clone());
-             Vector2d transVec = MathUtil.adjustDeadband(transStick, DEADBAND, false, false);
-             double spinVal = MathUtil.adjustDeadband(rotStick, DEADBAND, true, true).getX();
-             dt.swerve(spinVal, transVec);
+        Vector2d transVec;
+        double spinVal;
+        if(MathUtil.outOfDeadband(transStick, DEADBAND)){
+             transVec = MathUtil.adjustDeadband(transStick, DEADBAND, false, false);
         }
         else {
-            dt.stop();
+            transVec = new Vector2d(0.0,0.0);
         }
+        
+        if(MathUtil.outOfDeadband(rotStick, DEADBAND)) {
+             spinVal = MathUtil.adjustDeadband(rotStick, DEADBAND, true, true).getX();
+             setHeading = dt.getGyroHeading();//in degrees for more intuitive P-gain
+        }
+        else {
+            if(Double.isNaN(setHeading)) {
+                spinVal = 0.0;
+            }
+            else {
+                spinVal = kHeading*MathUtil.boundHalfAngleDeg(setHeading - dt.getGyroHeading());
+            }
+        }
+        dt.swerve(spinVal, transVec);
     }
 
     

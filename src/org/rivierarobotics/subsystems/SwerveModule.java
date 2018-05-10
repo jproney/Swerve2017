@@ -19,12 +19,12 @@ public class SwerveModule {
         FR, FL, BL, BR;
     }
 
-    private static final int MAX_POSSIBLE_VELOCITY = 2250;
     private static final int CRUISE_VEL = 1800;
     private static final int ACCEL = 7200;
     private static final int MOTION_MAGIC_IDX = 0;
     private static final int SLOT_IDX = 0;
     private static final int TIMEOUT = 10;
+    private static final double SMALL_NUMBER = .00001;
     public static final double kP = 0.0005*1023;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
@@ -135,12 +135,20 @@ public class SwerveModule {
     }
 
     public void setToVectorDumb(Vector2d drive) {
+        if(drive.getMagnitude() < SMALL_NUMBER) {
+            setDrivePower(0.0);
+            return;
+        }
         setPositionRads(drive.getAngle());
         setDrivePower(drive.getMagnitude());
     }
 
     public void setToVectorSmart(Vector2d drive) {
         double pow = drive.getMagnitude();
+        if(pow < SMALL_NUMBER) {
+            setDrivePower(0.0);
+            return;
+        }
         if (Math.abs(MathUtil.boundHalfAngleRad(drive.getAngle() - getPositionRad())) > Math.PI/2.0) {
             drive = drive.scale(-1);
             pow *= -1;
